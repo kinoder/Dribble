@@ -1,0 +1,128 @@
+body {
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f9;
+  }
+
+  .container {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar h2 {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  .sidebar a {
+    color: #ecf0f1;
+    text-decoration: none;
+    margin: 10px 0;
+    font-size: 18px;
+    text-align: center;
+    transition: background 0.3s;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+  }
+
+  .sidebar a:hover {
+    background: #34495e;
+  }
+
+  /* Content Area */
+  .content {
+    flex: 1;
+    padding: 30px;
+    background: #ecf0f1;
+    overflow-y: auto;
+  }
+
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    background: #34495e;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: background 0.3s;
+  }
+
+  .tab:hover {
+    background: #1abc9c;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .active-tab {
+    display: block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  table th,
+  table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #bdc3c7;
+  }
+
+  table th {
+    background-color: #34495e;
+    color: white;
+  }
+
+  table td {
+    background-color: #f9f9f9;
+  }
+
+  table tr:hover {
+    background-color: #ecf0f1;
+  }
+
+  button {
+    background-color: #27ae60;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 20px;
+  }
+
+  button:hover {
+    background-color: #2ecc71;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }

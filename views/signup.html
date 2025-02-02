@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="signup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Sign Up</h2>
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+
+      <label for="role" style="color: #ecf0f1; margin: 10px 0">Role:</label>
+      <select id="role">
+        <option value="buyer">Buyer</option>
+        <option value="designer">Designer</option>
+      </select>
+
+      <div class="button-container">
+        <button class="signup" onclick="signup()">Sign Up</button>
+      </div>
+    </div>
+    <script src="signup.js"></script>
+  </body>
+</html>

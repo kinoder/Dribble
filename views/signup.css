@@ -1,0 +1,79 @@
+body {
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #2c3e50, #4b6584);
+    margin: 0;
+  }
+  .container {
+    background: #1e272e;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 350px;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  h2 {
+    color: #ecf0f1;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  input,
+  select {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid #485460;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #485460;
+    color: #ecf0f1;
+    transition: border-color 0.3s;
+  }
+  input:focus,
+  select:focus {
+    border-color: #a5b1c2;
+    outline: none;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  .signup {
+    background-color: #27ae60;
+    color: white;
+  }
+  .signup:hover {
+    background-color: #2ecc71;
+    transform: scale(1.05);
+  }
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }

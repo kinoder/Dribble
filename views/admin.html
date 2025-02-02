@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="javascript:void(0)" onclick="showTab('users')">Manage Users</a>
+        <a href="javascript:void(0)" onclick="showTab('designs')"
+          >Manage Designs</a
+        >
+        <a href="javascript:void(0)" onclick="showTab('purchases')"
+          >Manage Purchases</a
+        >
+        <a href="logout.html">Logout</a>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab" onclick="showTab('users')">Users</div>
+          <div class="tab" onclick="showTab('designs')">Designs</div>
+          <div class="tab" onclick="showTab('purchases')">Purchases</div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="users" class="tab-content">
+          <h3>Manage Users</h3>
+          <div class="button-container">
+            <button onclick="createUser()">Create User</button>
+          </div>
+          <table id="users-table">
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+            <!-- Users will be loaded here -->
+          </table>
+        </div>
+        <div id="designs" class="tab-content">
+          <h3>Manage Designs</h3>
+          <button onclick="createDesign()">Create Design</button>
+          <table id="designs-table">
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Actions</th>
+            </tr>
+            <!-- Designs will be loaded here -->
+          </table>
+        </div>
+        <div id="purchases" class="tab-content">
+          <h3>Manage Purchases</h3>
+          <table id="purchases-table">
+            <tr>
+              <th>Username</th>
+              <th>Design</th>
+              <th>Date</th>
+            </tr>
+            <!-- Purchases will be loaded here -->
+          </table>
+        </div>
+      </div>
+    </div>
+    <script src="admin.js"></script>
+  </body>
+</html>
