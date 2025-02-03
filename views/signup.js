@@ -21,7 +21,11 @@ function signup() {
       .then((data) => {
         if (data.message === "User created") {
           alert("User created successfully!");
-          window.location.href = "login.html";
+          if (role === "admin") {
+            window.location.href = "admin.html";
+          } else {
+            window.location.href = "login.html";
+          }
         } else {
           alert(data.message || "Something went wrong");
         }

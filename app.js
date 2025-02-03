@@ -1,10 +1,17 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-app.use(cors());
-app.use(express.json());
 const mongoose = require("mongoose");
 const connectionString = "mongodb://localhost:27017/Dribble";
+const path = require("path");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
+const secretKey = process.env.SECRET_KEY || "supersecretkey";
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "views")));
 
 //connecting to database(Dribble Database)
 mongoose
@@ -24,14 +31,42 @@ const Users = require("./models/user");
 const Designs = require("./models/design");
 const Orders = require("./models/order");
 const Accounts = require("./models/account");
+//loading localhost:2000
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "login.html"));
+});
+
+//Middleware for authentication
+const authenticate = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Access Denied" });
+  }
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid Token" });
+    }
+    req.user = decoded;
+    next();
+  });
+};
+
+//Middleware for authorization
+const authorize = (roles) => (req, res, next) => {
+  if (!roles.includes(req.user.role)) {
+    return res.status(403).json({ message: "Access Denied" });
+  }
+  next();
+};
 
 //Get All users
-app.get("/users", async (req, res) => {
+app.get("/users", authenticate, authorize(["admin"]), async (req, res) => {
   try {
     const users = await Users.find();
     res.status(200).json(users);
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 //Create User
@@ -41,18 +76,19 @@ app.post("/users", async (req, res) => {
     const existingUser = await Users.findOne({
       $or: [{ username }, { email }],
     });
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
 
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User with this username or email already exists" });
-    }
-
-    const newUser = new Users({ username, password, email, role });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new Users({
+      username,
+      password: hashedPassword,
+      email,
+      role,
+    });
     await newUser.save();
-    res.status(200).json({ message: "User created" });
+    res.status(201).json({ message: "User created successfully" });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -65,37 +101,40 @@ app.put("/users/:id", async (req, res) => {
       new: true,
     });
     if (!updatedUser) {
-      console.log("user not found");
-      res.status(404);
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).send("user updated");
+    res.status(200).json({ message: "User Updated" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
 //Delete User
-app.delete("/users/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deletedUser = await Users.findByIdAndDelete(id);
-    if (!deletedUser) {
-      console.log("user not found");
-      res.status(404);
+app.delete(
+  "/users/:id",
+  authenticate,
+  authorize(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deletedUser = await Users.findByIdAndDelete(id);
+      if (!deletedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json({ message: "User deleted" });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
     }
-    res.status(200).send("user deleted");
-  } catch (err) {
-    console.log(err);
   }
-});
+);
 
 //Get All Designs
-app.get("/designs", async (req, res) => {
+app.get("/designs", authenticate, async (req, res) => {
   try {
     const designs = await Designs.find();
     res.status(200).json(designs);
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -114,9 +153,9 @@ app.post("/designs", async (req, res) => {
       purchase,
     });
     await newDesign.save();
-    res.status(201).send("desing created");
+    res.status(201).json({ message: "desing created" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -128,11 +167,11 @@ app.put("/designs/:id", async (req, res) => {
       new: true,
     });
     if (!updatedDesign) {
-      return res.status(404).send("design not found");
+      return res.status(404).json({ message: "design not found" });
     }
-    res.status(200).send("user updated");
+    res.status(200).json({ message: "Desgin updated" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -141,10 +180,11 @@ app.delete("/designs/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const deletedDesign = await Designs.findByIdAndDelete(id);
-    if (!deletedDesign) return res.status(404).send("design not found");
-    res.status(200).send("design deleted");
+    if (!deletedDesign)
+      return res.status(404).josn({ message: "design not found" });
+    res.status(200).json({ message: "Design deleted" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -154,7 +194,7 @@ app.get("/orders", async (req, res) => {
     const orders = await Orders.find();
     res.status(200).json(orders);
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -184,10 +224,11 @@ app.put("/orders/:id", async (req, res) => {
       { buyer, designs, totalAmount },
       { new: true }
     );
-    if (!updatedOrder) return res.status(404).send("not found");
-    res.status(200).send("order updated");
+    if (!updatedOrder)
+      return res.status(404).json({ message: "order not found" });
+    res.status(200).json({ message: "order updated" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -196,10 +237,11 @@ app.delete("/orders/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const deletedOrder = await Orders.findByIdAndDelete(id);
-    if (!deletedOrder) return res.status(404).send("order not found");
-    res.status(200).send("order deleted");
+    if (!deletedOrder)
+      return res.status(404).json({ message: "order not found" });
+    res.status(200).json({ message: "order deleted" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -255,15 +297,16 @@ app.post("/accounts/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const existingAccount = await Accounts.findOne({ user: id });
-    if (existingAccount) return res.status(400).send("account already exists");
+    if (existingAccount)
+      return res.status(400).json({ message: "account already exists" });
     const newAccount = new Accounts({
       user: id,
       balance: 0,
     });
     await newAccount.save();
-    res.status(200).send("account created");
+    res.status(200).json({ message: "account created" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -272,12 +315,12 @@ app.post("/accounts", async (req, res) => {
   try {
     const { userId, amount } = req.body;
     let account = await Accounts.findOne({ user: userId });
-    if (!account) return res.status(404).send("account not found");
+    if (!account) return res.status(404).json({ message: "account not found" });
     account.balance += amount;
     await account.save();
-    return res.status(200).send("balanced increased");
+    return res.status(200).json({ message: "balanced increased" });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -350,10 +393,15 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    if (user.password !== password) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
-    res.status(200).json({ message: "Login successful", role: user.role });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+
+    const token = jwt.sign({ userId: user._id, role: user.role }, secretKey, {
+      expiresIn: "2h",
+    });
+    res
+      .status(200)
+      .json({ message: "Login successful", token, role: user.role });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Internal server error" });
